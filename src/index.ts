@@ -1,8 +1,8 @@
 import express from "express";
-import cors from "cors";
-import postRoutes from "./routes/v1/posts";
-// エラーハンドリング用のミドルウェアを作成して読み込んでいます
-import { errorHandler, notFound } from "./middleware/errorMiddleware";
+import { typeDefs } from "./schema";
+import { resolvers } from "./resolvers";
+import { ApolloServer } from "apollo-server-express";
+import expressPlayground from "graphql-playground-middleware-express";
 import connectDB from "./config/db";
 
 // DBと接続
@@ -10,19 +10,21 @@ connectDB();
 
 const app = express();
 
-// CORS設定
-app.use(cors());
+// Apollo Serverの設定
+const server = new ApolloServer({ typeDefs, resolvers });
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// Apollo Serverを起動
+server.start().then(() => {
+  // .envファイル内PORT設定したポート番号で起動。デフォルトは3001。
+  const port = process.env.PORT || 3001;
 
-app.use("/posts", postRoutes);
+  app.use("/graphql", server.getMiddleware());
 
-app.use(notFound);
-// app.use(errorHandler);
+  // GraphQL Playgroundを設定
+  app.get("/playground", expressPlayground({ endpoint: "/graphql" }));
 
-// .envファイル内PORT設定したポート番号で起動。デフォルトは3001。
-const port = process.env.PORT || 3001;
-
-app.listen(port);
-console.log("Express WebAPI listening on port " + port);
+  app.listen(port, () => {
+    console.log(`🚀 Server ready at http://localhost:${port}/graphql`);
+    console.log(`🚀 Playground ready at http://localhost:${port}/playground`);
+  });
+});

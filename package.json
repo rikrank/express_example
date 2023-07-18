@@ -16,11 +16,14 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@apollo/server": "^4.7.5",
     "apollo-server-express": "^3.12.0",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
     "graphql": "^16.7.1",
-    "mongoose": "^7.3.4"
+    "mongoose": "^7.3.4",
+    "server": "link:@types/@apollo/server",
+    "standalon": "link:@apollo/server/standalon"
   },
   "devDependencies": {
     "@types/cors": "^2.8.13",
